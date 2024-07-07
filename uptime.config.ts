@@ -45,13 +45,13 @@ const workerConfig = {
       // refer to docs https://github.com/lyc8503/UptimeFlare/wiki/Geo-specific-checks-setup before setting this value
       checkLocationWorkerRoute: 'https://hk.biliko.net',
     },
-    {
-      id: 'Home_Lab',
-      name: 'HomeLab',
-      method: 'GET',
-      target: 'https://auth.biliko.net',
-      checkLocationWorkerRoute: 'https://hk.biliko.net/',
-    },
+    // {
+    //   id: 'Home_Lab',
+    //   name: 'HomeLab',
+    //   method: 'GET',
+    //   target: 'https://auth.biliko.net',
+    //   checkLocationWorkerRoute: 'https://hk.biliko.net/',
+    // },
     // Example TCP Monitor
     // {
     //   id: 'test_tcp_monitor',
