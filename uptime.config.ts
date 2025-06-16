@@ -1,4 +1,6 @@
-const pageConfig = {
+import { MaintenanceConfig, PageConfig, WorkerConfig } from './types/config'
+
+const pageConfig: PageConfig = {
   // Title for your status page
   title: "Biliko's Status Page",
   // Links shown at the header of your status page, could set `highlight` to `true`
@@ -16,7 +18,7 @@ const pageConfig = {
   },
 }
 
-const workerConfig = {
+const workerConfig: WorkerConfig = {
   // Write KV at most every 3 minutes unless the status changed
   kvWriteCooldownMinutes: 3,
   // Enable HTTP Basic auth for status page & API by uncommenting the line below, format `<USERNAME>:<PASSWORD>`
@@ -54,9 +56,12 @@ const workerConfig = {
       responseKeyword: 'Biliko',
       // [OPTIONAL] if specified, the response must NOT contains the keyword to be considered as operational.
       responseForbiddenKeyword: 'bad gateway',
-      // [OPTIONAL] if specified, the check will run in your specified region,
-      // refer to docs https://github.com/lyc8503/UptimeFlare/wiki/Geo-specific-checks-setup before setting this value
-      // checkLocationWorkerRoute: 'https://xxx.example.com',
+      // [OPTIONAL] if specified, will call the check proxy to check the monitor, mainly for geo-specific checks
+      // refer to docs https://github.com/lyc8503/UptimeFlare/wiki/Check-proxy-setup before setting this value
+      // currently supports `worker://` and `http(s)://` proxies
+      // checkProxy: 'https://xxx.example.com OR worker://weur',
+      // [OPTIONAL] if true, the check will fallback to local if the specified proxy is down
+      // checkProxyFallback: true,
     },
       {
       id: 'HomeLab',
@@ -80,16 +85,18 @@ const workerConfig = {
   notification: {
     // [Optional] apprise API server URL
     // if not specified, no notification will be sent
-    appriseApiServer: "https://apprise.example.com/notify",
+    appriseApiServer: 'https://apprise.example.com/notify',
     // [Optional] recipient URL for apprise, refer to https://github.com/caronc/apprise
     // if not specified, no notification will be sent
-    recipientUrl: "tgram://bottoken/ChatID",
+    recipientUrl: 'tgram://bottoken/ChatID',
     // [Optional] timezone used in notification messages, default to "Etc/GMT"
-    timeZone: "Asia/Shanghai",
+    timeZone: 'Asia/Shanghai',
     // [Optional] grace period in minutes before sending a notification
     // notification will be sent only if the monitor is down for N continuous checks after the initial failure
     // if not specified, notification will be sent immediately
     gracePeriod: 5,
+    // [Optional] disable notification for monitors with specified ids
+    skipNotificationIds: ['foo_monitor', 'bar_monitor'],
   },
   callbacks: {
     onStatusChange: async (
@@ -102,7 +109,6 @@ const workerConfig = {
     ) => {
       // This callback will be called when there's a status change for any monitor
       // Write any Typescript code here
-
       // This will not follow the grace period settings and will be called immediately when the status changes
       // You need to handle the grace period manually if you want to implement it
     },
@@ -119,5 +125,28 @@ const workerConfig = {
   },
 }
 
+// You can define multiple maintenances here
+// During maintenance, an alert will be shown at status page
+// Also, related downtime notifications will be skipped (if any)
+// Of course, you can leave it empty if you don't need this feature
+// const maintenances: MaintenanceConfig[] = []
+const maintenances: MaintenanceConfig[] = [
+  {
+    // [Optional] Monitor IDs to be affected by this maintenance
+    monitors: ['foo_monitor', 'bar_monitor'],
+    // [Optional] default to "Scheduled Maintenance" if not specified
+    title: 'Test Maintenance',
+    // Description of the maintenance, will be shown at status page
+    body: 'This is a test maintenance, server software upgrade',
+    // Start time of the maintenance, in UNIX timestamp or ISO 8601 format
+    start: '2025-04-27T00:00:00+08:00',
+    // [Optional] end time of the maintenance, in UNIX timestamp or ISO 8601 format
+    // if not specified, the maintenance will be considered as on-going
+    end: '2025-04-30T00:00:00+08:00',
+    // [Optional] color of the maintenance alert at status page, default to "yellow"
+    color: 'blue',
+  },
+]
+
 // Don't forget this, otherwise compilation fails.
-export { pageConfig, workerConfig }
+export { pageConfig, workerConfig, maintenances }
